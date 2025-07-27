@@ -16,6 +16,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build
-        uses: mbg/actions/stack/build@v1
+        uses: mbg/actions/stack/build@v0.1
         with:
           upload-docs: true

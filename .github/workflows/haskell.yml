@@ -23,4 +23,4 @@ jobs:
       - name: Build
         uses: mbg/actions/stack/build@v0.2
         with:
-          upload-docs: true
+          upload-docs: ${{ matrix.os == 'ubuntu-24.04-arm' }}

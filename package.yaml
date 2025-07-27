@@ -8,6 +8,8 @@ copyright: "2025 Michael B. Gale"
 
 extra-source-files:
   - README.md
+
+extra-doc-files:
   - CHANGELOG.md
 
 # Metadata used when publishing your package

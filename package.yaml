@@ -33,18 +33,18 @@ default-extensions:
   - TypeOperators
 
 dependencies:
-  - aeson
-  - bytestring
+  - aeson >= 2.2.3 && < 2.3
   - base >= 4.7 && < 5
-  - containers
-  - deriving-aeson
-  - exceptions
-  - http-client
-  - http-client-tls
-  - http-types
-  - servant
-  - servant-client
-  - text
+  - bytestring >= 0.12.1 && < 0.13
+  - containers >= 0.6.8 && < 0.8
+  - deriving-aeson >= 0.2.10 && < 0.3
+  - exceptions >= 0.10.9 && < 0.11
+  - http-client >= 0.7.19 && < 0.8
+  - http-client-tls >= 0.3.6 && < 0.4
+  - http-types >= 0.12.4 && < 0.13
+  - servant >= 0.20.3 && < 0.21
+  - servant-client >= 0.20.3 && < 0.21
+  - text >= 2.1.1 && < 2.2
 
 ghc-options:
   - -Wall
@@ -70,7 +70,7 @@ executables:
       - -with-rtsopts=-N
     dependencies:
       - home-assistant-client
-      - optparse-applicative
+      - optparse-applicative >= 0.18.0 && < 0.20
 
 tests:
   home-assistant-client-test:

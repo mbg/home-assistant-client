@@ -3,6 +3,7 @@
 ![GitHub](https://img.shields.io/github/license/mbg/home-assistant-client)
 [![Haskell](https://github.com/mbg/home-assistant-client/actions/workflows/haskell.yml/badge.svg)](https://github.com/mbg/home-assistant-client/actions/workflows/haskell.yml)
 [![Stackage Nightly](https://github.com/mbg/home-assistant-client/actions/workflows/nightly.yml/badge.svg)](https://github.com/mbg/home-assistant-client/actions/workflows/nightly.yml)
+[![Hackage](https://img.shields.io/hackage/v/home-assistant-client)](https://hackage.haskell.org/package/home-assistant-client)
 
 A Haskell library for the [Home Assistant API](https://developers.home-assistant.io/docs/api/rest/), allowing you to write Haskell applications which interact with [Home Assistant](https://www.home-assistant.io).
 

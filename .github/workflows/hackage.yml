@@ -6,8 +6,8 @@ on:
       - ".github/workflows/hackage.yml"
   release:
     types:
-      - released
-      - prereleased
+      - created
+      - published
 
 concurrency:
   group: hackage
@@ -41,7 +41,7 @@ jobs:
         run: stack sdist .
 
       - name: Publish `home-assistant-client`
-        if: startsWith(github.ref, 'refs/tags/v') && github.event.action == 'released'
+        if: startsWith(github.ref, 'refs/tags/v') && github.event.action == 'published'
         shell: bash
         run: stack upload . --candidate --no-save-hackage-creds
         env:

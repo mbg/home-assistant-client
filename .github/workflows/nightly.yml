@@ -13,7 +13,7 @@ on:
     branches:
       - main
     paths:
-      - ".github/workflows/stackage-nightly.yml"
+      - ".github/workflows/nightly.yml"
 
 permissions:
   contents: read

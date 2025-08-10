@@ -11,7 +11,9 @@ module Options (
 
 --------------------------------------------------------------------------------
 
+import Data.Aeson
 import Data.Text
+import Data.ByteString.Lazy.Char8 qualified as C8
 
 import Options.Applicative
 
@@ -49,13 +51,16 @@ data NotificationCommand
         -- | The name of the service to send the notification to.
         sendNotificationDevice :: Text,
         -- | The message to send.
-        sendNotificationMessage :: Text
+        sendNotificationMessage :: Text,
+        -- | Arbitrary data to send.
+        sendNotificationData :: Maybe Value
     }
 
 sendNotificationP :: Parser NotificationCommand
 sendNotificationP = SendNotification <$>
     argument str (metavar "DEVICE") <*>
-    argument str (metavar "MESSAGE")
+    argument str (metavar "MESSAGE") <*>
+    optional (option (eitherReader (eitherDecode . C8.pack)) (long "data"))
 
 --------------------------------------------------------------------------------
 

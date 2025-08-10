@@ -57,8 +57,10 @@ runServiceCmd :: ClientEnv -> ServiceCommand -> IO ()
 runServiceCmd env ListServices = runAndFormat env services
 
 runNotificationCmd :: ClientEnv -> NotificationCommand -> IO ()
-runNotificationCmd env SendNotification{..} = runAndFormat env $
-    notify sendNotificationDevice (notification sendNotificationMessage)
+runNotificationCmd env SendNotification{..} = runAndFormat env $ do
+    let notificationData = OtherNotificationData <$> sendNotificationData
+        payload = setNotificationData notificationData $ notification sendNotificationMessage
+    notify sendNotificationDevice payload
 
 -- | 'main' is the main entry point for this application.
 main :: IO ()

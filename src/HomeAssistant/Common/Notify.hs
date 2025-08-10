@@ -1,5 +1,12 @@
 -- | Implements
-module HomeAssistant.Common.Notify (Notification, notification, notify) where
+module HomeAssistant.Common.Notify (
+    NotificationData(..),
+    Notification,
+    notification,
+    setNotificationTitle,
+    setNotificationData,
+    notify
+) where
 
 --------------------------------------------------------------------------------
 
@@ -108,6 +115,20 @@ notification message = MkNotification{
     notificationData = Nothing,
     notificationTarget = Nothing
 }
+
+-- | 'setNotificationTitle' @title notification@ sets @notification@'s @title@.
+setNotificationTitle ::
+    Maybe T.Text ->
+    Notification platform ->
+    Notification platform
+setNotificationTitle title n = n{ notificationTitle = title }
+
+-- | 'setNotificationData' @data notification@ sets @notification@'s @data@.
+setNotificationData ::
+    Maybe (NotificationData platform) ->
+    Notification platform ->
+    Notification platform
+setNotificationData d n = n{ notificationData = d }
 
 -- | 'notify' @device notification@ is a wrapper around `callService` that uses
 -- the notifications service to send @notification@ to @device@.

@@ -19,6 +19,10 @@ permissions:
   contents: read
   issues: write # needed for the `create-issue` option
 
+concurrency:
+  group: nightly-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: "Build"

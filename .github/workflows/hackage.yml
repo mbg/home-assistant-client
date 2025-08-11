@@ -25,6 +25,13 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  build-binaries:
+    name: "Build release binaries"
+    if: |
+      github.event_name == 'release' &&
+      github.event.action != 'published'
+    uses: ./.github/workflows/haskell.yml
+
   publish-to-hackage:
     name: "Publish to Hackage"
     runs-on: ubuntu-latest

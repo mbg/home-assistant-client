@@ -56,9 +56,44 @@ jobs:
         shell: bash
         run: ls -lahR
 
+  check-distribution:
+    name: "Check distribution"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Dump context"
+        shell: bash
+        env:
+          EVENT_DATA: "${{ toJson(github) }}"
+        run: echo $EVENT_DATA | jq
+
+      - name: "Clone repository"
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.release || github.ref }}
+
+      - name: "Install Stack"
+        uses: haskell-actions/setup@v2
+        id: install-haskell
+        with:
+          stack-no-global: true
+          enable-stack: true
+          stack-version: "latest"
+
+      - name: "Check source distribution"
+        shell: bash
+        run: stack sdist .
+
   publish-to-hackage:
     name: "Publish to Hackage"
     runs-on: ubuntu-latest
+    if: |
+      github.event.action == 'published' ||
+      inputs.environment
+
+    needs:
+      - check-distribution
+
     environment:
       name: ${{ (github.event.action == 'published' && 'Hackage') || inputs.environment || '' }}
       url: "https://hackage.haskell.org/package/home-assistant-client-${{ steps.determine-version.outputs.version }}"
@@ -90,10 +125,6 @@ jobs:
           stack-no-global: true
           enable-stack: true
           stack-version: "latest"
-
-      - name: "Check source distribution"
-        shell: bash
-        run: stack sdist .
 
       - name: Publish `home-assistant-client`
         if: |

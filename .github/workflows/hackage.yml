@@ -56,6 +56,17 @@ jobs:
         shell: bash
         run: ls -lahR
 
+      - name: "Upload release assets"
+        if: |
+          github.event_name == 'workflow_dispatch' ||
+          github.event_name == 'release'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REF: ${{ inputs.release || github.ref }}
+        run: |
+          gh release upload $REF *.tar.gz
+
   check-distribution:
     name: "Check distribution"
     runs-on: ubuntu-latest

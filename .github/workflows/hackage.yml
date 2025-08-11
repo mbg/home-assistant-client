@@ -42,6 +42,9 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'push'
 
+    permissions:
+      contents: write
+
     needs:
       - build-binaries
 

@@ -6,6 +6,10 @@ on:
       - main
   pull_request:
   workflow_call:
+    inputs:
+      attest:
+        type: boolean
+        default: false
 
 concurrency:
   group: haskell-${{ github.ref }}
@@ -15,6 +19,11 @@ jobs:
   build:
     name: "Build & Test"
     runs-on: ${{ matrix.os }}
+
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
 
     strategy:
       fail-fast: false
@@ -34,6 +43,13 @@ jobs:
         with:
           upload-docs: ${{ matrix.os == 'ubuntu-24.04-arm' }}
           install-dir: bin
+
+      - name: "Create attestation"
+        id: create-attestation
+        if: inputs.attest
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: bin/ha-client
 
       - name: "Archive ha-client binary"
         shell: bash

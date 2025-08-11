@@ -21,10 +21,21 @@ jobs:
         os: ["ubuntu-latest", "ubuntu-24.04-arm"]
 
     steps:
-      - name: Checkout repository
+      - name: "Checkout repository"
         uses: actions/checkout@v5
 
-      - name: Build
-        uses: mbg/actions/stack/build@v0.2
+      - name: "Create bin directory"
+        shell: bash
+        run: mkdir bin
+
+      - name: "Build & Test"
+        uses: mbg/actions/stack/build@v0.3
         with:
           upload-docs: ${{ matrix.os == 'ubuntu-24.04-arm' }}
+          install-dir: bin
+
+      - name: "Upload ha-client binary"
+        uses: actions/upload-artifact@v4
+        with:
+          path: bin/ha-client
+          name: ha-client-${{ runner.os }}-${{ runner.arch }}

@@ -35,8 +35,16 @@ jobs:
           upload-docs: ${{ matrix.os == 'ubuntu-24.04-arm' }}
           install-dir: bin
 
+      - name: "Archive ha-client binary"
+        shell: bash
+        env:
+          OS: ${{ runner.os }}
+          ARCH: ${{ runner.arch }}
+        run: |
+          tar -czvf ha-client-$OS-$ARCH.tar.gz bin/ha-client
+
       - name: "Upload ha-client binary"
         uses: actions/upload-artifact@v4
         with:
-          path: bin/ha-client
+          path: ha-client-${{ runner.os }}-${{ runner.arch }}.tar.gz
           name: ha-client-${{ runner.os }}-${{ runner.arch }}

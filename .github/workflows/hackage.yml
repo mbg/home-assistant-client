@@ -64,8 +64,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REF: ${{ inputs.release || github.ref }}
+          REPO: ${{ github.repository }}
         run: |
-          gh release upload $REF *.tar.gz
+          gh release upload $REF *.tar.gz --repo $REPO
 
   check-distribution:
     name: "Check distribution"

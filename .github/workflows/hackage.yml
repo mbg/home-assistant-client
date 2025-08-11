@@ -33,6 +33,26 @@ jobs:
       github.event_name != 'release'
     uses: ./.github/workflows/haskell.yml
 
+  upload-binaries:
+    name: "Upload release binaries"
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'release' &&
+      github.event.action == 'published') ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push'
+
+    needs:
+      - build-binaries
+
+    steps:
+      - name: "Download all artifacts"
+        uses: actions/download-artifact@v4
+
+      - name: "List artifact contents"
+        shell: bash
+        run: ls -lahR
+
   publish-to-hackage:
     name: "Publish to Hackage"
     runs-on: ubuntu-latest

@@ -40,7 +40,7 @@ jobs:
         run: echo $EVENT_DATA | jq
 
       - name: "Clone repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ inputs.release || github.ref }}
 

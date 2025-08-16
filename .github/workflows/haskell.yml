@@ -59,10 +59,7 @@ jobs:
   attest:
     name: "Attest"
     runs-on: ubuntu-latest
-    if: |
-      github.repository == 'mbg/home-assistant-client' &&
-      github.event_name == 'workflow_call' &&
-      inputs.attest != false
+    if: inputs.attest
 
     needs:
       - build

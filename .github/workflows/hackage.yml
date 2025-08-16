@@ -89,6 +89,9 @@ jobs:
     name: "Check distribution"
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+
     steps:
       - name: "Dump context"
         shell: bash
@@ -126,6 +129,9 @@ jobs:
     environment:
       name: ${{ (github.event.action == 'published' && 'Hackage') || inputs.environment || '' }}
       url: "https://hackage.haskell.org/package/home-assistant-client-${{ steps.determine-version.outputs.version }}"
+
+    permissions:
+      contents: read
 
     steps:
       - name: "Dump context"

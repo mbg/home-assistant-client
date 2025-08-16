@@ -27,10 +27,13 @@ concurrency:
 jobs:
   build-binaries:
     name: "Build release binaries"
+    # Run when a release is created, but not when it is published.
+    # Also run for non-release events for testing.
     if: |
       (github.event_name == 'release' &&
       github.event.action != 'published') ||
-      github.event_name != 'release'
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push'
 
     permissions:
       contents: read
@@ -39,14 +42,17 @@ jobs:
 
     uses: ./.github/workflows/haskell.yml
     with:
+      # Only create attestations when releasing or testing with `workflow_dispatch`.
       attest: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' }}
 
   upload-binaries:
     name: "Upload release binaries"
     runs-on: ubuntu-latest
+    # Run when a release is created, but not when it is published.
+    # Also run for non-release events for testing.
     if: |
       (github.event_name == 'release' &&
-      github.event.action == 'published') ||
+      github.event.action != 'published') ||
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'push'
 

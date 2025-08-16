@@ -25,9 +25,104 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  build-binaries:
+    name: "Build release binaries"
+    # Run when a release is created, but not when it is published.
+    # Also run for non-release events for testing.
+    if: |
+      (github.event_name == 'release' &&
+      github.event.action != 'published') ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push'
+
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    uses: ./.github/workflows/haskell.yml
+    with:
+      # Only create attestations when releasing or testing with `workflow_dispatch`.
+      attest: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' }}
+
+  upload-binaries:
+    name: "Upload release binaries"
+    runs-on: ubuntu-latest
+    # Run when a release is created, but not when it is published.
+    # Also run for non-release events for testing.
+    if: |
+      (github.event_name == 'release' &&
+      github.event.action != 'published') ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push'
+
+    permissions:
+      contents: write
+
+    needs:
+      - build-binaries
+
+    steps:
+      - name: "Download all artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "ha-client-*"
+          merge-multiple: true
+
+      - name: "List artifact contents"
+        shell: bash
+        run: ls -lahR
+
+      - name: "Upload release assets"
+        if: |
+          github.event_name == 'workflow_dispatch' ||
+          github.event_name == 'release'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REF: ${{ inputs.release || github.ref }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh release upload $REF *.tar.gz --repo $REPO
+
+  check-distribution:
+    name: "Check distribution"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Dump context"
+        shell: bash
+        env:
+          EVENT_DATA: "${{ toJson(github) }}"
+        run: echo $EVENT_DATA | jq
+
+      - name: "Clone repository"
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.release || github.ref }}
+
+      - name: "Install Stack"
+        uses: haskell-actions/setup@v2
+        id: install-haskell
+        with:
+          stack-no-global: true
+          enable-stack: true
+          stack-version: "latest"
+
+      - name: "Check source distribution"
+        shell: bash
+        run: stack sdist .
+
   publish-to-hackage:
     name: "Publish to Hackage"
     runs-on: ubuntu-latest
+    if: |
+      github.event.action == 'published' ||
+      inputs.environment
+
+    needs:
+      - check-distribution
+
     environment:
       name: ${{ (github.event.action == 'published' && 'Hackage') || inputs.environment || '' }}
       url: "https://hackage.haskell.org/package/home-assistant-client-${{ steps.determine-version.outputs.version }}"
@@ -59,10 +154,6 @@ jobs:
           stack-no-global: true
           enable-stack: true
           stack-version: "latest"
-
-      - name: "Check source distribution"
-        shell: bash
-        run: stack sdist .
 
       - name: Publish `home-assistant-client`
         if: |

@@ -5,9 +5,14 @@ on:
     branches:
       - main
   pull_request:
+  workflow_call:
+    inputs:
+      attest:
+        type: boolean
+        default: false
 
 concurrency:
-  group: haskell-${{ github.ref }}
+  group: haskell-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -15,16 +20,77 @@ jobs:
     name: "Build & Test"
     runs-on: ${{ matrix.os }}
 
+    permissions:
+      contents: read
+
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest", "ubuntu-24.04-arm"]
 
     steps:
-      - name: Checkout repository
+      - name: "Checkout repository"
         uses: actions/checkout@v5
 
-      - name: Build
-        uses: mbg/actions/stack/build@v0.2
+      - name: "Create bin directory"
+        shell: bash
+        run: mkdir bin
+
+      - name: "Build & Test"
+        uses: mbg/actions/stack/build@v0.3
         with:
           upload-docs: ${{ matrix.os == 'ubuntu-24.04-arm' }}
+          install-dir: bin
+
+      - name: "Archive ha-client binary"
+        shell: bash
+        env:
+          OS: ${{ runner.os }}
+          ARCH: ${{ runner.arch }}
+        run: |
+          tar -czvf ha-client-$OS-$ARCH.tar.gz bin/ha-client
+
+      - name: "Upload ha-client binary"
+        uses: actions/upload-artifact@v4
+        with:
+          path: ha-client-${{ runner.os }}-${{ runner.arch }}.tar.gz
+          name: ha-client-${{ runner.os }}-${{ runner.arch }}
+
+  attest:
+    name: "Attest"
+    runs-on: ubuntu-latest
+    if: inputs.attest
+
+    needs:
+      - build
+
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: "Download all artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "ha-client-*"
+          merge-multiple: true
+
+      - name: "Unpack artifacts"
+        shell: bash
+        run: |
+          ls -lahR
+          for file in *.tar.gz; do
+            echo "$file"
+            dir=${file%.tar.gz}
+            mkdir -p "$dir"
+            tar -xzvf "$file" -C "$dir"
+          done
+          ls -lahR
+
+      - name: "Create attestations"
+        id: create-attestation
+        if: inputs.attest
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "**/bin/ha-client"

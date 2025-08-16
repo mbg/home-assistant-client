@@ -22,8 +22,6 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write
-      attestations: write
 
     strategy:
       fail-fast: false
@@ -44,13 +42,6 @@ jobs:
           upload-docs: ${{ matrix.os == 'ubuntu-24.04-arm' }}
           install-dir: bin
 
-      - name: "Create attestation"
-        id: create-attestation
-        if: inputs.attest
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-path: bin/ha-client
-
       - name: "Archive ha-client binary"
         shell: bash
         env:
@@ -64,3 +55,45 @@ jobs:
         with:
           path: ha-client-${{ runner.os }}-${{ runner.arch }}.tar.gz
           name: ha-client-${{ runner.os }}-${{ runner.arch }}
+
+  attest:
+    name: "Attest"
+    runs-on: ubuntu-latest
+    if: |
+      github.repository == 'mbg/home-assistant-client' &&
+      github.event_name == 'workflow_call' &&
+      inputs.attest != false
+
+    needs:
+      - build
+
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: "Download all artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "ha-client-*"
+          merge-multiple: true
+
+      - name: "Unpack artifacts"
+        shell: bash
+        run: |
+          ls -lahR
+          for file in *.tar.gz; do
+            echo "$file"
+            dir=${file%.tar.gz}
+            mkdir -p "$dir"
+            tar -xzvf "$file" -C "$dir"
+          done
+          ls -lahR
+
+      - name: "Create attestations"
+        id: create-attestation
+        if: inputs.attest
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "**/bin/ha-client"

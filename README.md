@@ -32,6 +32,14 @@ main = do
 
 ## CLI usage
 
+You can download the `ha-client` program from the [releases list](https://github.com/mbg/home-assistant-client/releases).
+
 You must set an environment variable named `HA_TOKEN` to your [long-lived token](https://developers.home-assistant.io/docs/auth_api/#long-lived-access-token). The CLI also inspects the `HA_ADDRESS` environment variable to determine the address of the Home Assistant server. This is optional and will default to `http://homeassistant.local:8123/` if no value is set.
 
 The `ha-client` CLI can be invoked with `--help` to retrieve usage information. All sub-commands also support the `--help` flag to retrieve command-specific help.
+
+### Build provenance
+
+For releases, build provenance attestations are created that allow you to verify the authenticity of a `ha-client` binary. All available attestations can be viewed [here](https://github.com/mbg/home-assistant-client/attestations).
+
+To verify the origin of a `ha-client` binary, you can run `gh attestation verify --owner mbg ha-client`. This assumes that you have the [GitHub CLI](https://docs.github.com/en/github-cli/github-cli/quickstart) installed. For more information about verifying build provenance attestations, read the [relevant GitHub documentation](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations#verifying-artifact-attestations-with-the-github-cli).

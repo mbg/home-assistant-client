@@ -8,6 +8,7 @@ name: "CodeQL"
 
 jobs:
   analyse:
+    name: "Analyse"
     runs-on: ubuntu-latest
 
     permissions:

@@ -51,7 +51,7 @@ jobs:
           tar -czvf ha-client-$OS-$ARCH.tar.gz bin/ha-client
 
       - name: "Upload ha-client binary"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           path: ha-client-${{ runner.os }}-${{ runner.arch }}.tar.gz
           name: ha-client-${{ runner.os }}-${{ runner.arch }}

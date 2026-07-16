@@ -100,7 +100,7 @@ jobs:
         run: echo $EVENT_DATA | jq
 
       - name: "Clone repository"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.release || github.ref }}
 
@@ -141,7 +141,7 @@ jobs:
         run: echo $EVENT_DATA | jq
 
       - name: "Clone repository"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.release || github.ref }}
 

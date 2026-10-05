@@ -37,7 +37,7 @@ jobs:
         run: mkdir bin
 
       - name: "Build & Test"
-        uses: mbg/actions/stack/build@v0.3
+        uses: mbg/actions/stack/build@v0.4
         with:
           upload-docs: ${{ matrix.os == 'ubuntu-24.04-arm' }}
           install-dir: bin
